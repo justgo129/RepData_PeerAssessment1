@@ -180,9 +180,10 @@ weekdayinfo<-subset(activitynona, daytype == "weekday")
 
 #Plot
 par(mfrow=c(1,2))
-stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean)
-  plot(stepsweekendmean, main="Mean Interval of Steps\n Taken on Weekends", cex = 0.8, type="l", 
-       xlab = "Mean Number of Steps", ylab = "Interval")
+stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean) 
+  plot(stepsweekendmean, main="Mean Interval of Steps\n Taken on Weekends",
+       xlab = "Mean Number of Steps", ylab = "Interval", cex = 0.8,
+       ylim =c(0, 175), xlim=c(0,300))
   points(stepsweekendmean, pch=1)
   lines(stepsweekendmean, col=1)
 
