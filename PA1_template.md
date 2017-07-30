@@ -1,10 +1,10 @@
-"Reproducible Research Course Project 1"
+Reproducible Research Course Project 1"
 Prepared 2017-07-28 by Justin Goldstein using RStudio v.1.0.143
 =====================================================================================\n
 
-We load the necessary files and libraries from a directory on the analyst's laptop into R version 3.4.1.  Our main 
-dataframe will be called
-*activity*, which contains three (3) columns: *steps* (total number of steps during 5-minute interval), 
+## We load the necessary files and libraries from a directory on the analyst's laptop into R version 3.4.1.  
+Data are obtained from the page accessble at: https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
+Our main dataframe will be called *activity*, which contains three (3) columns: *steps* (total number of steps during 5-minute interval), 
 *date*, and *interval* (number of five-minute interval).
 
 
@@ -18,15 +18,14 @@ par(mfrow=c(1,1))
 
 ---
 
-We compute a **histogram** of the total number of steps taken each day.  
+## We compute a **histogram** of the total number of steps taken each day.  
 We perform the analysis by using the "tapply" command to sum the
 steps taken each day.  *Steps* having "NA" values are ignored during this analysis. 
 
 
 ```r
 #Aggregates steps by day.
-totalstepsperday<-tapply(activity$steps, 
-activity$date, sum, na.rm=TRUE) 
+totalstepsperday<-tapply(activity$steps, activity$date, sum, na.rm=TRUE) 
 
 #Plots histogram
 hist(totalstepsperday, xlab="Steps Per Day", main="Histogram of\n Total Steps per Day")
@@ -36,7 +35,8 @@ hist(totalstepsperday, xlab="Steps Per Day", main="Histogram of\n Total Steps pe
 
 ---
 
-We then compute the **median** and **mean** values, respectively, for steps per day, 
+## We then compute the **median** and **mean** values,
+respectively, for steps per day, 
 using the *totalstepsperday* value mentioned in the chunk above.
 
 
@@ -50,31 +50,38 @@ The mean steps per day is 9354.2295082.
 
 ---
 
-We compute a time series plot of the average number of steps taken daily.  Again,
-we employ the *tapply* command but this time compute the mean instead of the sum.
+## We compute a time series plot of the average number of steps taken daily.  
+Again, we employ the *tapply* command but this time compute the mean instead of the sum.
 
 
 
 ```r
 #Computes mean and total number of steps per day
-meanstepsperday<-tapply(activity$steps, 
-activity$date, mean)
-totalstepsperday<-tapply(activity$steps, 
-activity$date, sum)
+meanstepsperday<-tapply(activity$steps, activity$date, mean) %>%
+  as.data.frame()
+totalstepsperday<-tapply(activity$steps, activity$date, sum) %>%
+  as.data.frame()
 
 #Plot
-plot(totalstepsperday, main="Mean Total Steps per Day", xlab="Steps", ylab="Day")
-points(totalstepsperday, pch=1)
-lines(totalstepsperday, col=2)
+activity$date<-as.Date(as.character(activity$date), "%Y-m-%d")
+require(ggplot2)
+require(reshape)
+names(meanstepsperday) = "Steps"
+plot(meanstepsperday$Steps, xlab="Steps", ylab="Date", main="Mean Number of Steps per Day)
+lines(meanstepsperday[,1])
 ```
 
-![plot of chunk avg_steps_day](figure/avg_steps_day-1.png)
+```
+## Error: <text>:12:61: unexpected INCOMPLETE_STRING
+## 12: plot(meanstepsperday$Steps, xlab="Steps", ylab="Date", main="Mean Number of Steps per Day)
+## 13: lines(meanstepsperday[,1])
+##                                                                 ^
+```
 
 ---
 
-We now calculate the 5-minute interval that, 
-on average, contains the maximum number of steps.  We do this by using
-the "tapply" command to aggregate the mean number of steps by interval
+## We now calculate the 5-minute interval that, on average, contains the maximum number of steps.  
+We do this by using the "tapply" command to aggregate the mean number of steps by interval
 and locating the number of steps mentioned above.
 
 
@@ -92,7 +99,7 @@ answer<-names(answer)
 #Plot
 plot(stepsmean, type="l", xlab="Interval",
 ylab="Steps Taken", main="Number of steps\n taken on average,
-averaged across all days", cex = 0.8)
+averaged across all days", cex = 0.7)
 ```
 
 ![plot of chunk fivemininterval](figure/fivemininterval-1.png)
@@ -103,7 +110,7 @@ producing an average value of 2050 steps.
 
 ---
 
-We now display a code to describe and show a strategy for imputing missing data.
+## We now display a code to describe and show a strategy for **imputing** missing data.
 Here, due to the fact that there are entire days without measurements of steps, we impute 
 these missing values using the median value of all steps (i.e., not those with "NA") values.  
 
@@ -156,13 +163,12 @@ those displayed above (i.e., before imputation of "NA" values).
 
 ---
   
-We now produce a panel plot comparing the average number of steps taken per 5-minute interval 
-across weekdays and weekends.  We do this by (1) copying the "activity" dataset to one called 
+## We now produce a panel plot comparing the average number of steps taken per 5-minute interval
+across **weekdays** and **weekends**.  We do this by (1) copying the "activity" dataset to one called 
 *activitynona* and then using the "weekdays" command on the "date" field.
 
 
 ```r
-
 #Prepare file formats
 activitynona$date <- as.Date(activitynona$date)
 activitynona$daytype<-weekdays(activitynona$date) %>%
@@ -178,32 +184,25 @@ for (i in 1:length(activitynona$daytype)) {
 }
 
 #Subset by *activitynona* value for "weekday" or "weekend"
-weekendinfo<-subset(activitynona, activitynona = "weekend")
-weekdayinfo<-subset(activitynona, activitynona = "weekday")
+weekendinfo<-subset(activitynona, activitynona$daytype == "weekend")
+weekdayinfo<-subset(activitynona, activitynona$daytype == "weekday")
 
 #Plot
 par(mfrow=c(1,2))
-
-stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean) %>%
-  plot(., main="Mean Interval of Steps\n Taken on Weekends", cex = 0.8,
-       xlab = "Mean Number of Steps", ylab = "Interval") %>
-  points(., pch=1) %>%
-  lines(., col=1) %>%
+stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean)
+  plot(stepsweekendmean, main="Mean Interval of Steps\n Taken on Weekends", cex = 0.8, xlab = "Mean Number of Steps", ylab = "Interval")
+  points(stepsweekendmean, pch=1)
+  lines(stepsweekendmean, col=1)
 
 
-stepsweekdaymean <- tapply(weekdayinfo$steps, weekdayinfo$interval, mean) %>%
-  plot(., main="Mean Interval of Steps\n Taken on Weekdays",
-       xlab = "Mean Number of Steps", ylab = "Interval", cex = 0.8) %>%
-  points(., pch=1) %>%
-  lines(., col=1) %>%
+stepsweekdaymean <- tapply(weekdayinfo$steps, weekdayinfo$interval, mean) 
+  plot(stepsweekdaymean, main="Mean Interval of Steps\n Taken on Weekdays",
+       xlab = "Mean Number of Steps", ylab = "Interval", cex = 0.8)
+  points(stepsweekdaymean, pch=1)
+  lines(stepsweekdaymean, col=1)
 ```
 
-```
-## Error: <text>:25:58: unexpected input
-## 24:   plot(., main="Mean Interval of Steps\n Taken on Weekends", cex = 0.8,
-## 25:        xlab = "Mean Number of Steps", ylab = "Interval") %>
-##                                                              ^
-```
+![plot of chunk weekends_weekdays](figure/weekends_weekdays-1.png)
 
 The nearly identical nature of these plots indicates that one's step exercise routine doesn't seem to vary 
 according to weekend or weekdays.  This may be a function of the aforementioned imputation routine, in which 
