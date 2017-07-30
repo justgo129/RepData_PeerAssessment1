@@ -1,8 +1,4 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
+
 Reproducible Research Course Project 1"
 Prepared 2017-07-28 by Justin Goldstein using RStudio v.1.0.143
 =====================================================================================

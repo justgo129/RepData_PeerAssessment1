@@ -1,3 +1,4 @@
+
 Reproducible Research Course Project 1"
 Prepared 2017-07-28 by Justin Goldstein using RStudio v.1.0.143
 =====================================================================================
@@ -115,28 +116,26 @@ identically to the fashion mentioned above, except using these imputed values.
 numberNAs<-sum(is.na(activity$steps))  # Quantifies number of "NA"s in "steps" column
 numberNAsavg<-100*numberNAs/length(activity[,1])
 
+activity<-read.csv("activity.csv", header=TRUE, sep=",")
 activitynona<-activity           # Creates an identical dataset
 
 # Perform the imputation
 for (i in 1:length(activitynona$steps)) {
-if (is.na(activitynona$steps[i])) {
-activitynona$steps[i] <- median(activity$steps,na.rm =TRUE)
-}
+  if (is.na(activitynona$steps[i])) {
+    activitynona$steps[i] <- median(activity$steps,na.rm =TRUE)
+  }
 }
 
 # Create the histogram
-hist(totalstepsperday, xlab = "Steps per Day", 
+hist(activitynona$steps, xlab = "Steps per Day", 
 main = "Histogram of data when NAs are imputed")
 ```
 
-```
-## Error in hist.default(totalstepsperday, xlab = "Steps per Day", main = "Histogram of data when NAs are imputed"): 'x' must be numeric
-```
+![plot of chunk imputing](figure/imputing-1.png)
 
 ```r
 #Computes new median and mean steps per day values.
-totalstepsperday<-tapply(activitynona$steps, activitynona$date,
-sum, na.rm=TRUE)
+totalstepsperday<-tapply(activitynona$steps, activitynona$date, sum, na.rm=TRUE)
 meantotalstepsday<-mean(totalstepsperday)
 mediantotalstepsday<-median(totalstepsperday)
 ```
@@ -145,14 +144,15 @@ The "steps" column in the "activity" dataframe contains 2304 missing values whic
 equivalent to 2304 of all those values.
 
 As the median value for all steps is zero, all the "NA" values in the "steps" 
-column of this new otherwise identical dataset were replaced with zeroes.
+column of this new otherwise identical dataset were replaced with zeroes.  This explains
+the "long-tail" distribution of the histogram, with most of the values being zeroes.
 
 This new dataset (which doesn't contain "NA" values) is called *activitynona*.  
 A histogram of the steps is practically identical to that shown above.
 
 The mean total of steps taken per day was derived by summing up the number of steps taken per day and 
 then averaging across all days.  The median was computed by taking the median of the daily measurements.  
-These values: NaN (mean) and NA (median) are practically identical to 
+These values: 9354.2295082 (mean) and 1.0395 &times; 10<sup>4</sup> (median) are practically identical to 
 those displayed above (i.e., before imputation of "NA" values).
 
 ---
@@ -163,10 +163,18 @@ across **weekdays** and **weekends**.  We do this by (1) copying the "activity" 
 
 
 ```r
-#Prepare file formats
-activitynona$date <- as.Date(activitynona$date)
-activitynona$daytype<-weekdays(activitynona$date) %>%
-  as.vector()
+#Prepare file formats - ensure no NAs
+activitynona$date<-as.Date(activitynona$date, format = "%Y-%m-%d")
+
+
+for (i in 1:length(activitynona$steps)) {
+  if (is.na(activitynona$steps[i])) {
+    activitynona$steps[i] <- median(activity$steps,na.rm =TRUE)
+  }
+}
+
+#Convert date to day of week
+activitynona$daytype<-weekdays(activitynona$date)
 
 # Check to see to which of two categories: "weekend" or "weekday," an obs belongs
 for (i in 1:length(activitynona$daytype)) {
@@ -178,36 +186,15 @@ for (i in 1:length(activitynona$daytype)) {
 }
 
 #Subset by *activitynona* value for "weekday" or "weekend"
-weekendinfo<-subset(activitynona, activitynona$daytype == "weekend")
-weekdayinfo<-subset(activitynona, activitynona$daytype == "weekday")
+weekendinfo<-subset(activitynona, daytype == "weekend")
+weekdayinfo<-subset(activitynona, daytype == "weekday")
 
 #Plot
 par(mfrow=c(1,2))
-stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean)
-  plot(stepsweekendmean, main="Mean Interval of Steps\n Taken on Weekends", cex = 0.8, xlab = "Mean Number of Steps", ylab = "Interval")
-```
-
-```
-## Warning in min(x): no non-missing arguments to min; returning Inf
-```
-
-```
-## Warning in max(x): no non-missing arguments to max; returning -Inf
-```
-
-```
-## Warning in min(x): no non-missing arguments to min; returning Inf
-```
-
-```
-## Warning in max(x): no non-missing arguments to max; returning -Inf
-```
-
-```
-## Error in plot.window(...): need finite 'xlim' values
-```
-
-```r
+stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean) 
+  plot(stepsweekendmean, main="Mean Interval of Steps\n Taken on Weekends",
+       xlab = "Mean Number of Steps", ylab = "Interval", cex = 0.8,
+       ylim =c(0, 175), xlim=c(0,300))
   points(stepsweekendmean, pch=1)
   lines(stepsweekendmean, col=1)
 
@@ -215,14 +202,11 @@ stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean)
 stepsweekdaymean <- tapply(weekdayinfo$steps, weekdayinfo$interval, mean) 
   plot(stepsweekdaymean, main="Mean Interval of Steps\n Taken on Weekdays",
        xlab = "Mean Number of Steps", ylab = "Interval", cex = 0.8)
-```
-
-![plot of chunk weekends_weekdays](figure/weekends_weekdays-1.png)
-
-```r
   points(stepsweekdaymean, pch=1)
   lines(stepsweekdaymean, col=1)
 ```
+
+![plot of chunk weekends_weekdays](figure/weekends_weekdays-1.png)
 
 The nearly identical nature of these plots indicates that one's step exercise routine doesn't seem to vary 
 according to weekend or weekdays.  This may be a function of the aforementioned imputation routine, in which 
