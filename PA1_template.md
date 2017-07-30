@@ -31,7 +31,7 @@ totalstepsperday<-tapply(activity$steps, activity$date, sum, na.rm=TRUE)
 hist(totalstepsperday, xlab="Steps Per Day", main="Histogram of\n Total Steps per Day")
 ```
 
-![plot of chunk totalstepshistogram](figure/totalstepshistogram-1.png)
+![plot of chunk totalstepshistogram](figure/initial_hist.png)
 
 ---
 
@@ -69,7 +69,7 @@ plot(meanstepsperday$Steps, xlab="Steps", ylab="Date", main="Mean Number of Step
 lines(meanstepsperday[,1])
 ```
 
-![plot of chunk avg_steps_day](figure/avg_steps_day-1.png)
+![plot of chunk avg_steps_day](figure/meantotalsteps.png)
 
 ---
 
@@ -94,7 +94,7 @@ plot(stepsmean, type="l", xlab="Interval",
 ylab="Steps Taken", main="Number of steps\n taken on average, averaged across all days", cex = 0.7)
 ```
 
-![plot of chunk fivemininterval](figure/fivemininterval-1.png)
+![plot of chunk fivemininterval](figure/avgsteps.png)
 
 The interval which has the highest average number of steps is 591, 
 producing an average value of 2050 steps.
@@ -119,18 +119,18 @@ activitynona<-activity           # Creates an identical dataset
 
 # Perform the imputation
 for (i in 1:length(activitynona$steps)) {
-if (is.na(activitynona$steps[i])) {
-activitynona$steps[i] <- median(activity$steps,na.rm =TRUE)
-}
+   if (is.na(activitynona$steps[i])) {
+      activitynona$steps[i] <- median(activity$steps,na.rm =TRUE)
+   }
 }
 
 # Create the histogram
-hist(totalstepsperday, xlab = "Steps per Day", 
+hist(activitynona$steps, xlab = "Steps per Day", 
 main = "Histogram of data when NAs are imputed")
 ```
 
 ```
-## Error in hist.default(totalstepsperday, xlab = "Steps per Day", main = "Histogram of data when NAs are imputed"): 'x' must be numeric
+![plot of chunk activitynona$steps](figure/avgsteps.png)
 ```
 
 ```r
