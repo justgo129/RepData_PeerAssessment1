@@ -1,6 +1,6 @@
 Reproducible Research Course Project 1"
 Prepared 2017-07-28 by Justin Goldstein using RStudio v.1.0.143
-=====================================================================================\n
+=====================================================================================
 
 ## We load the necessary files and libraries from a directory on the analyst's laptop into R version 3.4.1.  
 Data are obtained from the page accessble at: https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
@@ -64,19 +64,12 @@ totalstepsperday<-tapply(activity$steps, activity$date, sum) %>%
 
 #Plot
 activity$date<-as.Date(as.character(activity$date), "%Y-m-%d")
-require(ggplot2)
-require(reshape)
 names(meanstepsperday) = "Steps"
-plot(meanstepsperday$Steps, xlab="Steps", ylab="Date", main="Mean Number of Steps per Day)
+plot(meanstepsperday$Steps, xlab="Steps", ylab="Date", main="Mean Number of Steps per Day")
 lines(meanstepsperday[,1])
 ```
 
-```
-## Error: <text>:12:61: unexpected INCOMPLETE_STRING
-## 12: plot(meanstepsperday$Steps, xlab="Steps", ylab="Date", main="Mean Number of Steps per Day)
-## 13: lines(meanstepsperday[,1])
-##                                                                 ^
-```
+![plot of chunk avg_steps_day](figure/avg_steps_day-1.png)
 
 ---
 
@@ -98,8 +91,7 @@ answer<-names(answer)
 
 #Plot
 plot(stepsmean, type="l", xlab="Interval",
-ylab="Steps Taken", main="Number of steps\n taken on average,
-averaged across all days", cex = 0.7)
+ylab="Steps Taken", main="Number of steps\n taken on average, averaged across all days", cex = 0.7)
 ```
 
 ![plot of chunk fivemininterval](figure/fivemininterval-1.png)
@@ -137,7 +129,9 @@ hist(totalstepsperday, xlab = "Steps per Day",
 main = "Histogram of data when NAs are imputed")
 ```
 
-![plot of chunk imputing](figure/imputing-1.png)
+```
+## Error in hist.default(totalstepsperday, xlab = "Steps per Day", main = "Histogram of data when NAs are imputed"): 'x' must be numeric
+```
 
 ```r
 #Computes new median and mean steps per day values.
@@ -158,7 +152,7 @@ A histogram of the steps is practically identical to that shown above.
 
 The mean total of steps taken per day was derived by summing up the number of steps taken per day and 
 then averaging across all days.  The median was computed by taking the median of the daily measurements.  
-These values: 9354.2295082 (mean) and 1.0395 &times; 10<sup>4</sup> (median) are practically identical to 
+These values: NaN (mean) and NA (median) are practically identical to 
 those displayed above (i.e., before imputation of "NA" values).
 
 ---
@@ -191,6 +185,29 @@ weekdayinfo<-subset(activitynona, activitynona$daytype == "weekday")
 par(mfrow=c(1,2))
 stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean)
   plot(stepsweekendmean, main="Mean Interval of Steps\n Taken on Weekends", cex = 0.8, xlab = "Mean Number of Steps", ylab = "Interval")
+```
+
+```
+## Warning in min(x): no non-missing arguments to min; returning Inf
+```
+
+```
+## Warning in max(x): no non-missing arguments to max; returning -Inf
+```
+
+```
+## Warning in min(x): no non-missing arguments to min; returning Inf
+```
+
+```
+## Warning in max(x): no non-missing arguments to max; returning -Inf
+```
+
+```
+## Error in plot.window(...): need finite 'xlim' values
+```
+
+```r
   points(stepsweekendmean, pch=1)
   lines(stepsweekendmean, col=1)
 
@@ -198,11 +215,14 @@ stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean)
 stepsweekdaymean <- tapply(weekdayinfo$steps, weekdayinfo$interval, mean) 
   plot(stepsweekdaymean, main="Mean Interval of Steps\n Taken on Weekdays",
        xlab = "Mean Number of Steps", ylab = "Interval", cex = 0.8)
-  points(stepsweekdaymean, pch=1)
-  lines(stepsweekdaymean, col=1)
 ```
 
 ![plot of chunk weekends_weekdays](figure/weekends_weekdays-1.png)
+
+```r
+  points(stepsweekdaymean, pch=1)
+  lines(stepsweekdaymean, col=1)
+```
 
 The nearly identical nature of these plots indicates that one's step exercise routine doesn't seem to vary 
 according to weekend or weekdays.  This may be a function of the aforementioned imputation routine, in which 

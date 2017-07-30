@@ -1,8 +1,9 @@
-"Reproducible Research Course Project 1"
+Reproducible Research Course Project 1"
 Prepared 2017-07-28 by Justin Goldstein using RStudio v.1.0.143
-=====================================================================================\n
+=====================================================================================
 
 ## We load the necessary files and libraries from a directory on the analyst's laptop into R version 3.4.1.  
+Data are obtained from the page accessble at: https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
 Our main dataframe will be called *activity*, which contains three (3) columns: *steps* (total number of steps during 5-minute interval), 
 *date*, and *interval* (number of five-minute interval).
 
@@ -22,8 +23,7 @@ steps taken each day.  *Steps* having "NA" values are ignored during this analys
 
 ```{r totalstepshistogram, echo=TRUE}
 #Aggregates steps by day.
-totalstepsperday<-tapply(activity$steps, 
-activity$date, sum, na.rm=TRUE) 
+totalstepsperday<-tapply(activity$steps, activity$date, sum, na.rm=TRUE) 
 
 #Plots histogram
 hist(totalstepsperday, xlab="Steps Per Day", main="Histogram of\n Total Steps per Day")
@@ -50,17 +50,17 @@ Again, we employ the *tapply* command but this time compute the mean instead of 
 
 
 ``` {r avg_steps_day, echo=TRUE}
-
 #Computes mean and total number of steps per day
-meanstepsperday<-tapply(activity$steps, 
-activity$date, mean)
-totalstepsperday<-tapply(activity$steps, 
-activity$date, sum)
+meanstepsperday<-tapply(activity$steps, activity$date, mean) %>%
+  as.data.frame()
+totalstepsperday<-tapply(activity$steps, activity$date, sum) %>%
+  as.data.frame()
 
 #Plot
-plot(totalstepsperday, main="Mean Total Steps per Day", xlab="Steps", ylab="Day")
-points(totalstepsperday, pch=1)
-lines(totalstepsperday, col=2)
+activity$date<-as.Date(as.character(activity$date), "%Y-m-%d")
+names(meanstepsperday) = "Steps"
+plot(meanstepsperday$Steps, xlab="Steps", ylab="Date", main="Mean Number of Steps per Day")
+lines(meanstepsperday[,1])
 ```
 
 ---
@@ -83,8 +83,7 @@ answer<-names(answer)
 
 #Plot
 plot(stepsmean, type="l", xlab="Interval",
-ylab="Steps Taken", main="Number of steps\n taken on average,
-averaged across all days", cex = 0.7)
+ylab="Steps Taken", main="Number of steps\n taken on average, averaged across all days", cex = 0.7)
 ```
 
 The interval which has the highest average number of steps is `r answer`, 
@@ -167,7 +166,6 @@ weekdayinfo<-subset(activitynona, activitynona$daytype == "weekday")
 
 #Plot
 par(mfrow=c(1,2))
-
 stepsweekendmean <- tapply(weekendinfo$steps, weekendinfo$interval, mean)
   plot(stepsweekendmean, main="Mean Interval of Steps\n Taken on Weekends", cex = 0.8, xlab = "Mean Number of Steps", ylab = "Interval")
   points(stepsweekendmean, pch=1)
